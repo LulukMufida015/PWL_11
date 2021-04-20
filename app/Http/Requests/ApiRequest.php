@@ -3,28 +3,33 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
-class ApiRequest extends FormRequest
+use App\Traits\ApiResponse;
+use Illuminate\Contracts\Validation\Validator;
+use App\Http\Requests\Request;
+use Symfony\Component\HttpFoundation\Response as Response;
+use Illuminate\Http\Exceptions\HttpResponseException;
+abstract class ApiRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return false;
-    }
-
+    use ApiResponse;
     /**
      * Get the validation rules that apply to the request.
      *
      * @return array
      */
-    public function rules()
+    abstract public function rules();
+    protected function failedValidation(Validator $validator)
     {
-        return [
-            //
-        ];
+        throw new HttpResponseException($this->apiError(
+            $validator->errors(),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        ));
+    }
+
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException($this->apiError(
+            null,
+            Response::HTTP_UNAUTHORIZED,
+        ));
     }
 }
