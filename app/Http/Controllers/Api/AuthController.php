@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\user;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
@@ -30,7 +31,7 @@ class AuthController extends Controller
     		'user'=>$user,
     	]);
     }
-    
+
     public function login(LoginRequest $request)
     {
     	$validated = $request->validated();
@@ -47,5 +48,22 @@ class AuthController extends Controller
     		'token_type'=>'Bearer',
     		'user'=>$user,
     	]);
+    }
+    
+    public function logout()
+    {
+    	try
+    	{
+    		Auth::user()->tokens->each(function($token, $key) {
+		        $token->delete();
+		    });
+    		return $this->apiSuccess('Token revoked');
+    	}catch(\Throwable $e)
+    	{
+    		 throw new HttpResponseException($this->apiError(
+             null,
+             Response::HTTP_INTERNAL_SERVER_ERROR,
+        	));
+    	}
     }
 }
