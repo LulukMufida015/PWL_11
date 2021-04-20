@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Requests;
-
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
-
+use Auth;
+use App\Http\Requests\ApiRequest;
 class TodoRequest extends ApiRequest
 {
     /**
